@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receipt Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    
+    .form-section {
+      margin-bottom: 30px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #eee;
+      color: #444;
+    }
+    
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -10px;
+    }
+    
+    .form-group {
+      flex: 1 1 300px;
+      padding: 0 10px;
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    .items-table th,
+    .items-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    
+    .items-table th {
+      background-color: #f9f9f9;
+      font-weight: 500;
+    }
+    
+    .items-table input {
+      border: none;
+      background: transparent;
+      width: 100%;
+      padding: 5px;
+    }
+    
+    .items-table input:focus {
+      outline: none;
+      background-color: #f0f7ff;
+    }
+    
+    .amount-col {
+      min-width: 120px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background-color: #4a6cf7;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #3a5bd9;
+    }
+    
+    .btn-danger {
+      background-color: #f25c66;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background-color: #e04b55;
+    }
+    
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      padding: 10px 20px;
+    }
+    
+    .btn-success:hover {
+      background-color: #218838;
+    }
+    
+    .btn-action {
+      margin-right: 10px;
+    }
+    
+    .total-section {
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+    
+    .total-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+    
+    .total-label {
+      width: 150px;
+      text-align: right;
+      padding-right: 20px;
+      font-weight: 500;
+    }
+    
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    
+    /* Receipt Preview */
+    .receipt-preview {
+      margin-top: 40px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+    
+    .receipt {
+      background: white;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+    }
+    
+    .receipt-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+    
+    .company-info {
+      max-width: 60%;
+    }
+    
+    .company-name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .company-details {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+    
+    .receipt-info {
+      text-align: right;
+    }
+    
+    .receipt-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .bill-to {
+      margin-bottom: 30px;
+    }
+    
+    .bill-to-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    
+    .receipt-items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    
+    .receipt-items th,
+    .receipt-items td {
+      border-bottom: 1px solid #eee;
+      padding: 12px 8px;
+      text-align: left;
+    }
+    
+    .receipt-items th {
+      color: #555;
+      font-weight: 500;
+    }
+    
+    .text-right {
+      text-align: right;
+    }
+    
+    .receipt-totals {
+      width: 250px;
+      margin-left: auto;
+    }
+    
+    .receipt-total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+    
+    .receipt-total-border {
+      border-top: 1px solid #ddd;
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+    
+    .receipt-footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    @media print {
+      .container {
+        box-shadow: none;
+        border: none;
+      }
+      
+      .receipt-preview {
+        border: none;
+        padding: 0;
+        background: white;
+      }
+      
+      body {
+        background: white;
+      }
+      
+      .form-section, .action-buttons, h1 {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Receipt Generator</h1>
+    
+    <div class="form-section">
+      <h2 class="section-title">Company Information</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="companyName">Company Name</label>
+          <input type="text" id="companyName" value="Your Company Name">
+        </div>
+        <div class="form-group">
+          <label for="companyAddress">Company Address</label>
+          <textarea id="companyAddress">123 Business Street, City, State ZIP</textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="companyPhone">Phone</label>
+          <input type="text" id="companyPhone" value="(123) 456-7890">
+        </div>
+        <div class="form-group">
+          <label for="companyEmail">Email</label>
+          <input type="email" id="companyEmail" value="contact@yourcompany.com">
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h2 class="section-title">Receipt Information</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="receiptNumber">Receipt Number</label>
+          <input type="text" id="receiptNumber" value="10001">
+        </div>
+        <div class="form-group">
+          <label for="receiptDate">Date</label>
+          <input type="date" id="receiptDate" value="2025-02-24">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="customerName">Customer Name</label>
+          <input type="text" id="customerName" value="Customer Name">
+        </div>
+        <div class="form-group">
+          <label for="customerAddress">Customer Address</label>
+          <textarea id="customerAddress">Customer Address</textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h2 class="section-title">Items</h2>
+      <table class="items-table" id="itemsTable">
+        <thead>
+          <tr>
+            <th width="40%">Description</th>
+            <th width="10%">Qty</th>
+            <th width="20%">Rate</th>
+            <th width="20%" class="amount-col">Amount</th>
+            <th width="10%">Action</th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody">
+          <tr>
+            <td><input type="text" class="item-description" value="Service Item 1"></td>
+            <td><input type="number" class="item-quantity" value="1" min="1"></td>
+            <td><input type="number" class="item-rate" value="100" min="0" step="0.01"></td>
+            <td class="amount-col">$100.00</td>
+            <td><button class="btn btn-danger btn-sm delete-row">✕</button></td>
+          </tr>
+          <tr>
+            <td><input type="text" class="item-description" value="Service Item 2"></td>
+            <td><input type="number" class="item-quantity" value="2" min="1"></td>
+            <td><input type="number" class="item-rate" value="75" min="0" step="0.01"></td>
+            <td class="amount-col">$150.00</td>
+            <td><button class="btn btn-danger btn-sm delete-row">✕</button></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <button id="addItemBtn" class="btn btn-primary btn-action">Add Item</button>
+      
+      <div class="total-section">
+        <div class="total-row">
+          <div class="total-label">Subtotal:</div>
+          <div id="subtotal">$250.00</div>
+        </div>
+        <div class="total-row">
+          <div class="total-label"><strong>Total:</strong></div>
+          <div id="total"><strong>$250.00</strong></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button id="generateBtn" class="btn btn-success">Generate Receipt PDF</button>
+    </div>
+    
+    <div class="receipt-preview">
+      <h2 class="section-title">Receipt Preview</h2>
+      <div class="receipt" id="receiptPreview">
+        <div class="receipt-header">
+          <div class="company-info">
+            <div class="company-name" id="previewCompanyName">Your Company Name</div>
+            <div class="company-details" id="previewCompanyDetails">
+              123 Business Street, City, State ZIP<br>
+              (123) 456-7890<br>
+              contact@yourcompany.com
+            </div>
+          </div>
+          <div class="receipt-info">
+            <div class="receipt-title">RECEIPT</div>
+            <div>#<span id="previewReceiptNumber">10001</span></div>
+            <div id="previewReceiptDate">2025-02-24</div>
+          </div>
+        </div>
+        
+        <div class="bill-to">
+          <div class="bill-to-title">Bill To:</div>
+          <div id="previewCustomerName">Customer Name</div>
+          <div id="previewCustomerAddress">Customer Address</div>
+        </div>
+        
+        <table class="receipt-items">
+          <thead>
+            <tr>
+              <th width="50%">Description</th>
+              <th width="10%">Qty</th>
+              <th width="20%" class="text-right">Rate</th>
+              <th width="20%" class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="previewItemsBody">
+            <tr>
+              <td>Service Item 1</td>
+              <td>1</td>
+              <td class="text-right">$100.00</td>
+              <td class="text-right">$100.00</td>
+            </tr>
+            <tr>
+              <td>Service Item 2</td>
+              <td>2</td>
+              <td class="text-right">$75.00</td>
+              <td class="text-right">$150.00</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="receipt-totals">
+          <div class="receipt-total-row">
+            <div>Subtotal:</div>
+            <div id="previewSubtotal">$250.00</div>
+          </div>
+          <div class="receipt-total-row receipt-total-border">
+            <div><strong>Total:</strong></div>
+            <div id="previewTotal"><strong>$250.00</strong></div>
+          </div>
+        </div>
+        
+        <div class="receipt-footer">
+          Thank you for your business!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get DOM elements
+      const companyName = document.getElementById('companyName');
+      const companyAddress = document.getElementById('companyAddress');
+      const companyPhone = document.getElementById('companyPhone');
+      const companyEmail = document.getElementById('companyEmail');
+      const receiptNumber = document.getElementById('receiptNumber');
+      const receiptDate = document.getElementById('receiptDate');
+      const customerName = document.getElementById('customerName');
+      const customerAddress = document.getElementById('customerAddress');
+      const itemsTable = document.getElementById('itemsTable');
+      const itemsBody = document.getElementById('itemsBody');
+      const addItemBtn = document.getElementById('addItemBtn');
+      const generateBtn = document.getElementById('generateBtn');
+      const subtotalEl = document.getElementById('subtotal');
+      const totalEl = document.getElementById('total');
+      
+      // Preview elements
+      const previewCompanyName = document.getElementById('previewCompanyName');
+      const previewCompanyDetails = document.getElementById('previewCompanyDetails');
+      const previewReceiptNumber = document.getElementById('previewReceiptNumber');
+      const previewReceiptDate = document.getElementById('previewReceiptDate');
+      const previewCustomerName = document.getElementById('previewCustomerName');
+      const previewCustomerAddress = document.getElementById('previewCustomerAddress');
+      const previewItemsBody = document.getElementById('previewItemsBody');
+      const previewSubtotal = document.getElementById('previewSubtotal');
+      const previewTotal = document.getElementById('previewTotal');
+      
+      // Format currency
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD'
+        }).format(amount);
+      }
+      
+      // Calculate row amount
+      function calculateRowAmount(row) {
+        const quantityInput = row.querySelector('.item-quantity');
+        const rateInput = row.querySelector('.item-rate');
+        const amountCell = row.querySelector('.amount-col');
+        
+        const quantity = parseFloat(quantityInput.value) || 0;
+        const rate = parseFloat(rateInput.value) || 0;
+        const amount = quantity * rate;
+        
+        amountCell.textContent = formatCurrency(amount);
+        return amount;
+      }
+      
+      // Calculate totals
+      function calculateTotals() {
+        const rows = itemsBody.querySelectorAll('tr');
+        let subtotal = 0;
+        
+        rows.forEach(row => {
+          subtotal += calculateRowAmount(row);
+        });
+        
+        const total = subtotal;
+        
+        subtotalEl.textContent = formatCurrency(subtotal);
+        totalEl.innerHTML = `<strong>${formatCurrency(total)}</strong>`;
+        
+        previewSubtotal.textContent = formatCurrency(subtotal);
+        previewTotal.innerHTML = `<strong>${formatCurrency(total)}</strong>`;
+        
+        return { subtotal, total };
+      }
+      
+      // Add new item row
+      function addItemRow() {
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td><input type="text" class="item-description" placeholder="Item description"></td>
+          <td><input type="number" class="item-quantity" value="1" min="1"></td>
+          <td><input type="number" class="item-rate" value="0" min="0" step="0.01"></td>
+          <td class="amount-col">$0.00</td>
+          <td><button class="btn btn-danger btn-sm delete-row">✕</button></td>
+        `;
+        
+        itemsBody.appendChild(newRow);
+        
+        const descInput = newRow.querySelector('.item-description');
+        const quantityInput = newRow.querySelector('.item-quantity');
+        const rateInput = newRow.querySelector('.item-rate');
+        const deleteBtn = newRow.querySelector('.delete-row');
+        
+        descInput.addEventListener('input', updatePreview);
+        quantityInput.addEventListener('input', () => {
+          calculateTotals();
+          updatePreview();
+        });
+        rateInput.addEventListener('input', () => {
+          calculateTotals();
+          updatePreview();
+        });
+        deleteBtn.addEventListener('click', () => deleteItemRow(newRow));
+        
+        calculateTotals();
+        updatePreview();
+        return newRow;
+      }
+      
+      // Delete item row
+      function deleteItemRow(row) {
+        if (itemsBody.querySelectorAll('tr').length > 1) {
+          row.remove();
+          calculateTotals();
+          updatePreview();
+        } else {
+          alert('Cannot delete the last row.');
+        }
+      }
+      
+      // Update preview
+      function updatePreview() {
+        previewCompanyName.textContent = companyName.value;
+        previewCompanyDetails.innerHTML = `
+          ${companyAddress.value}<br>
+          ${companyPhone.value}<br>
+          ${companyEmail.value}
+        `;
+        
+        previewReceiptNumber.textContent = receiptNumber.value;
+        previewReceiptDate.textContent = receiptDate.value;
+        previewCustomerName.textContent = customerName.value;
+        previewCustomerAddress.textContent = customerAddress.value;
+        
+        // Update items
+        previewItemsBody.innerHTML = '';
+        const rows = itemsBody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+          const description = row.querySelector('.item-description').value;
+          const quantity = row.querySelector('.item-quantity').value;
+          const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
+          const amount = quantity * rate;
+          
+          const previewRow = document.createElement('tr');
+          previewRow.innerHTML = `
+            <td>${description}</td>
+            <td>${quantity}</td>
+            <td class="text-right">${formatCurrency(rate)}</td>
+            <td class="text-right">${formatCurrency(amount)}</td>
+          `;
+          
+          previewItemsBody.appendChild(previewRow);
+        });
+      }
+      
+      // Generate PDF (simplified for this example)
+      function generatePDF() {
+        window.print();
+      }
+      
+      // Add event listeners
+      companyName.addEventListener('input', updatePreview);
+      companyAddress.addEventListener('input', updatePreview);
+      companyPhone.addEventListener('input', updatePreview);
+      companyEmail.addEventListener('input', updatePreview);
+      receiptNumber.addEventListener('input', updatePreview);
+      receiptDate.addEventListener('input', updatePreview);
+      customerName.addEventListener('input', updatePreview);
+      customerAddress.addEventListener('input', updatePreview);
+      
+      // Add event listeners to existing row inputs
+      const existingRows = itemsBody.querySelectorAll('tr');
+      existingRows.forEach(row => {
+        const descInput = row.querySelector('.item-description');
+        const quantityInput = row.querySelector('.item-quantity');
+        const rateInput = row.querySelector('.item-rate');
+        const deleteBtn = row.querySelector('.delete-row');
+        
+        descInput.addEventListener('input', updatePreview);
+        quantityInput.addEventListener('input', () => {
+          calculateTotals();
+          updatePreview();
+        });
+        
+        rateInput.addEventListener('input', () => {
+          calculateTotals();
+          updatePreview();
+        });
+        
+        deleteBtn.addEventListener('click', () => deleteItemRow(row));
+      });
+      
+      addItemBtn.addEventListener('click', addItemRow);
+      generateBtn.addEventListener('click', generatePDF);
+      
+      // Initialize
+      calculateTotals();
+      updatePreview();
+    });
+  </script>
+</body>
+</html>
